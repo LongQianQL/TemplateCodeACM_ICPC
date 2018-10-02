@@ -42,7 +42,7 @@ public class OptimalPaths2d {
     
     
     
-    static List<List<Integer>> getNeighbours(int node, int[] thispred, int pred) {
+    static List<List<Integer>> getNeighbours(int node, int[] thispred, int pred, boolean rec) {
         if (node < 1) {
             return new ArrayList<>();
         }
@@ -59,8 +59,8 @@ public class OptimalPaths2d {
             if (pred == next) continue; // Only recurse backwards
             if (next < 1 || next > n*n) continue;
             if (thispred[next] != 0) continue; // Already explored in this iteration
-            if (preds[next] != 0) { // Here we skip and check untaken paths
-                List<List<Integer>> res2 = getNeighbours(preds[next], thispred, next);
+            if (!rec && preds[next] != 0) { // Here we skip and check untaken paths
+                List<List<Integer>> res2 = getNeighbours(preds[next], thispred, next, true);
                 for (List<Integer> i: res2) {
                     i.add(next);
                     res.add(i);
@@ -101,10 +101,11 @@ public class OptimalPaths2d {
             
             if (cur % n == 0) break; // Reached right edge
             
-            for (List<Integer> next: getNeighbours(cur, thispred, -1)) {
+            for (List<Integer> next: getNeighbours(cur, thispred, -1, false)) {
                 int nextnode = next.get(0);
                 
                 if (dist + weights[nextnode] < thisdist[nextnode]) {
+                    thisdist[nextnode] = dist + weights[nextnode];
                     if (next.size() == 2) { // No skipping
                         thispred[nextnode] = cur;
                     } else { // Skips
@@ -119,10 +120,10 @@ public class OptimalPaths2d {
         }
         
         // Update global variables with this path
-        System.out.println(dist);
+        // System.out.println(dist);
         lava += dist;
         while (cur > 0) {
-            System.out.println("Cur: " + cur);
+            // System.out.println("Cur: " + cur);
             if (jumps[cur] != 0) {
                 int[] inf = unpack(jumps[cur]);
                 preds[inf[0]] = preds[inf[1]];
