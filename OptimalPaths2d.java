@@ -11,21 +11,44 @@ public class OptimalPaths2d {
     public static void main (String[] args) {
         // BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         
-        Scanner in = new Scanner(System.in);
+        // Scanner in = new Scanner(System.in);
         
-        n = in.nextInt();
-        t = in.nextInt();
+        // n = in.nextInt();
+        // t = in.nextInt();
         
-        weights = new int[n*n+1];
-        preds = new int[n*n+1];
-        for (int i = 1; i <= n*n; i++)
-            weights[i] = in.nextInt();
+        // weights = new int[n*n+1];
+        // preds = new int[n*n+1];
+        // for (int i = 1; i <= n*n; i++)
+            // weights[i] = in.nextInt();
         
-        for (int i = 0; i < 2*t; i++) {
-            dijkstraMod();
+        // for (int i = 0; i < 2*t; i++) {
+            // dijkstraMod();
+        // }
+        
+        // System.out.println(lava);
+        
+        
+        Random rand = new Random();
+        for (n = 5; n <= 50; n++) {
+            for (t = 2; t <= n/2; t++) {
+                lava = 0;
+                weights = new int[n*n+1];
+                preds = new int[n*n+1];
+                for (int i = 1; i <= n*n; i++)
+                    weights[i] = rand.nextInt(10000)+1;
+                
+                for (int i = 0; i < 2*t; i++) {
+                    dijkstraMod();
+                }
+                
+                System.out.println(n + " " + t);
+                for (int i = 1; i < weights.length; i++) {
+                    System.out.print(weights[i] + " ");
+                    if (i % n == 0)
+                        System.out.println();
+                }
+            }
         }
-        
-        System.out.println(lava);
         
     }
     
@@ -43,9 +66,9 @@ public class OptimalPaths2d {
     
     
     static List<List<Integer>> getNeighbours(int node, int[] thispred, int pred, boolean rec) {
-        if (node < 1) {
-            return new ArrayList<>();
-        }
+        // if (node < 1) {
+            // return new ArrayList<>();
+        // }
         
         List<Integer> possible = new ArrayList<>();
         
@@ -59,7 +82,7 @@ public class OptimalPaths2d {
             if (pred == next) continue; // Only recurse backwards
             if (next < 1 || next > n*n) continue;
             if (thispred[next] != 0) continue; // Already explored in this iteration
-            if (!rec && preds[next] != 0) { // Here we skip and check untaken paths
+            if (preds[next] > 0) { // Here we skip and check untaken paths
                 List<List<Integer>> res2 = getNeighbours(preds[next], thispred, next, true);
                 for (List<Integer> i: res2) {
                     i.add(next);
@@ -122,16 +145,26 @@ public class OptimalPaths2d {
         // Update global variables with this path
         // System.out.println(dist);
         lava += dist;
+        // int count = 0;
         while (cur > 0) {
             // System.out.println("Cur: " + cur);
             if (jumps[cur] != 0) {
                 int[] inf = unpack(jumps[cur]);
-                preds[inf[0]] = preds[inf[1]];
+                preds[inf[0]] = inf[1];
+                // if (count++ < 10) System.out.println(cur + " " + inf[0] + " " + inf[1] + " " + preds[inf[1]] + " " + preds[inf[0]]);
                 cur = inf[1];
             } else {
                 preds[cur] = thispred[cur];
                 cur = preds[cur];
+                // count = 0;
             }
+        }
+        
+        System.out.println("\n");
+        for (int i = 1; i < preds.length; i++) {
+            System.out.print(preds[i] + "\t");
+            if (i % n == 0)
+                System.out.println();
         }
     } 
 }
